@@ -1,0 +1,16 @@
+# OS stuff
+.DS_Store
+
+#Build directory
+target/*
+
+#VS code settings
+.vscode/*
+
+#Generated files
+*.cpp
+
+#Secrets file
+AUTH_TOKEN.h
+
+photon_firmware*
