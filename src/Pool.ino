@@ -1,18 +1,21 @@
+// Blynk token kept in file listed in .gitignore
+#include "BLYNK_SETTINGS.h"
+
 #include <DS18B20.h>
 #include <math.h>
 #include <blynk.h>
 #include <RelayShield.h>
-// Blynk token kept in file listed in .gitignore
-#include "AUTH_TOKEN.h"
+
+char authToken[] = BLYNK_AUTH_TOKEN;
 
 STARTUP(WiFi.selectAntenna(ANT_EXTERNAL));
 
-const int BLYNK_TERMINAL = V36;
-const int relay_pump = 1;                       // Black
-const int relay_circulation_pool = 2;           // Brown
+const int BLYNK_TERMINAL = V0;
+const int relay_pump = 1;             // Black
+const int relay_circulation_pool = 2; // Brown
 // Simulate the heater flow protection, proper one is broken :(
-const int relay_heater_flow_protection = 3;     // Yellow
-const int relay_circulation_heater_only = 4;    // Red
+const int relay_heater_flow_protection = 3;  // Yellow
+const int relay_circulation_heater_only = 4; // Red
 const int MAXRETRY = 4;
 const String event_prefix = "garden/pool/";
 // RMS voltage
@@ -24,8 +27,8 @@ const int rBurden = 100;     // Burden resistor value
 const int numSamples = 1000; // Number of samples before calculating RMS
 
 DS18B20 ds18b20_water(D1, true); // White
-DS18B20 ds18b20_out(D2, true);   // Grey
-DS18B20 ds18b20_in(D7, true);    // Green
+DS18B20 ds18b20_out(D7, true);   // Grey
+DS18B20 ds18b20_in(D2, true);    // Green
 
 char szInfo[64];
 double water_out_temp;
@@ -49,21 +52,41 @@ bool heaterOnNotification = false;
 RelayShield myRelays;
 BlynkTimer blynkTimer;
 WidgetTerminal terminal(BLYNK_TERMINAL);
-WidgetLED pump_led(V28);
-WidgetLED heater_led(V29);
+WidgetLED pump_led(V6);
+WidgetLED heater_led(V7);
 
 BLYNK_CONNECTED()
 {
-    Blynk.syncVirtual(V34, V35);
+    Blynk.syncVirtual(V8, V9);
 }
 
-BLYNK_WRITE(V34)
+BLYNK_WRITE(V8)
 {
     TimeInputParam t(param);
-    startPumpSecond = (t.getStartHour() * 3600) + (t.getStartMinute() * 60);
-    stopPumpSecond = (t.getStopHour() * 3600) + (t.getStopMinute() * 60);
+    long start = (t.getStartHour() * 3600) + (t.getStartMinute() * 60);
+    long stop = (t.getStopHour() * 3600) + (t.getStopMinute() * 60);
+    if (startPumpSecond == start && stopPumpSecond == stop)
+    {
+        // No change, just a reconnect event
+        return;
+    }
+
+    terminal.println(Time.format(Time.now(), "%F %R ") +
+                     "New pump schedule: " + padZeros(t.getStartHour()) + ":" + padZeros(t.getStartMinute()) +
+                     "-" + padZeros(t.getStopHour()) + ":" + padZeros(t.getStopMinute()));
+    terminal.flush();
+    startPumpSecond = start;
+    stopPumpSecond = stop;
 }
-BLYNK_WRITE(V35)
+
+char *padZeros(int val)
+{
+    char *buf = (char *)malloc(2);
+    sprintf(buf, "%02d", val);
+    return buf;
+}
+
+BLYNK_WRITE(V9)
 {
     if (desiredWaterTemp == param.asInt())
     {
@@ -100,7 +123,7 @@ void setup()
     myRelays.begin();
     myRelays.allOff();
 
-    Blynk.begin(BLYNK_AUTH_TOKEN);
+    Blynk.begin(authToken);
 
     // Makse sure valve is in known position
     // force pool only circulation
@@ -293,12 +316,12 @@ void readSensors()
 
 void publishData()
 {
-    Blynk.virtualWrite(V26, water_out_temp);
-    Blynk.virtualWrite(V27, water_in_temp);
-    Blynk.virtualWrite(V30, water_temp);
-    Blynk.virtualWrite(V31, watt);
+    Blynk.virtualWrite(V1, water_temp);
+    Blynk.virtualWrite(V2, water_out_temp);
+    Blynk.virtualWrite(V3, water_in_temp);
+    Blynk.virtualWrite(V4, watt);
     calculateEfficiency();
-    Blynk.virtualWrite(V32, efficiency);
+    Blynk.virtualWrite(V5, efficiency);
 }
 
 void calculateEfficiency()
@@ -323,18 +346,16 @@ void toggleBlynkLeds()
 {
     if (isHeaterOn())
     {
-        heater_led.setValue(127);
-        Blynk.virtualWrite(V33, 1);
+        heater_led.on();
     }
     else
     {
         heater_led.off();
-        Blynk.virtualWrite(V33, 0);
     }
 
     if (isPumpOn())
     {
-        pump_led.setValue(127);
+        pump_led.on();
     }
     else
     {
