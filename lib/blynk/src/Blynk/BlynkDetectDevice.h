@@ -144,6 +144,16 @@
         #define BLYNK_INFO_DEVICE  "Particle Ethernet"
         #elif PLATFORM_ID==10
         #define BLYNK_INFO_DEVICE  "Particle Electron"
+
+        #elif PLATFORM_ID==12
+        #define BLYNK_INFO_DEVICE  "Particle Argon"
+        #elif PLATFORM_ID==13
+        #define BLYNK_INFO_DEVICE  "Particle Boron"
+        #elif PLATFORM_ID==14
+        #define BLYNK_INFO_DEVICE  "Particle Xenon"
+        #elif PLATFORM_ID==26
+        #define BLYNK_INFO_DEVICE  "Particle Tracker"
+
         #elif PLATFORM_ID==31
         #define BLYNK_INFO_DEVICE  "Particle RPi"
         #elif PLATFORM_ID==82
@@ -352,6 +362,11 @@
         #define BLYNK_INFO_DEVICE  "ESP8266"
 
         /* ESP32 */
+        #elif defined(ARDUINO_ESP32C3_DEV)
+        #define BLYNK_INFO_DEVICE  "ESP32C3"
+        #define BLYNK_NO_ANALOG_PINS
+        #elif defined(ARDUINO_ESP32S2_DEV)
+        #define BLYNK_INFO_DEVICE  "ESP32S2"
         #elif defined(ARDUINO_ARCH_ESP32)
         #define BLYNK_INFO_DEVICE  "ESP32"
 
@@ -398,6 +413,12 @@
         #define BLYNK_BUFFERS_SIZE 1024
         #elif defined(ARDUINO_WILDFIRE_V4)
         #define BLYNK_INFO_DEVICE  "Wildfire V4"
+        #define BLYNK_USE_128_VPINS
+        #define BLYNK_BUFFERS_SIZE 1024
+
+         /* Seeed studio */
+        #elif defined(SEEED_WIO_TERMINAL)
+        #define BLYNK_INFO_DEVICE "Seeed Wio Terminal"
         #define BLYNK_USE_128_VPINS
         #define BLYNK_BUFFERS_SIZE 1024
 
