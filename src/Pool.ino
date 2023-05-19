@@ -11,20 +11,24 @@ char authToken[] = BLYNK_AUTH_TOKEN;
 STARTUP(WiFi.selectAntenna(ANT_EXTERNAL));
 
 const int BLYNK_TERMINAL = V0;
-const int relay_pump = 1;             // Black
-const int relay_circulation_pool = 2; // Brown
-// Simulate the heater flow protection, proper one is broken :(
-const int relay_heater_flow_protection = 3;  // Yellow
+
+// Pump on or off
+const int relay_pump = 1;
+// Circulate water to heater or only pool
+const int relay_circulation_pool = 2;        // Brown
 const int relay_circulation_heater_only = 4; // Red
+// Simulate the heater flow protection, the built-in one is broken :(
+const int relay_heater_flow_protection = 3;  // Cables to heater
+
 const int MAXRETRY = 4;
 const String event_prefix = "garden/pool/";
 // RMS voltage
-const double vRMS = 234.0; // Assumed or measured
+const double vRMS = 234.0;      // Assumed or measured
 // Parameters for measuring RMS current
-const double offset = 1.65;  // Half the ADC max voltage
-const int numTurns = 2000;   // 1:2000 transformer turns
-const int rBurden = 100;     // Burden resistor value
-const int numSamples = 1000; // Number of samples before calculating RMS
+const double offset = 1.65;     // Half the ADC max voltage
+const int numTurns = 2000;      // 1:2000 transformer turns
+const int rBurden = 100;        // Burden resistor value
+const int numSamples = 1000;    // Number of samples before calculating RMS
 
 DS18B20 ds18b20_water(D1, true); // White
 DS18B20 ds18b20_out(D7, true);   // Grey
